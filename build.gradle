@@ -1,13 +1,13 @@
 //file:noinspection UnnecessaryQualifiedReference
 //file:noinspection GroovyMissingReturnStatement
 plugins {
-	id 'fabric-loom' version '1.0-SNAPSHOT'
+	id 'fabric-loom' version '1.6.+'
 	id 'maven-publish'
 	id "com.modrinth.minotaur" version "2.+"
 	id "com.github.breadmoirai.github-release" version "2.4.1"
-	id 'org.ajoberstar.grgit' version '3.1.1'
+	id 'org.ajoberstar.grgit' version '5.2.2'
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
-	id 'se.bjurr.gitchangelog.git-changelog-gradle-plugin' version '1.73.0'
+	id 'se.bjurr.gitchangelog.git-changelog-gradle-plugin' version '2.1.2'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -256,4 +256,12 @@ task gitChangelogTask(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
 task release(dependsOn: [tasks.githubRelease, tasks.curseforge, tasks.modrinth]) {
 	group = 'publishing'
 	description = 'Releases a new version to Github, Modrinth, and Curseforge'
+}
+
+configurations.all {
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'com.fasterxml.jackson.core' && details.requested.name == 'jackson-core') {
+            details.useVersion '2.12.5'
+        }
+    }
 }
