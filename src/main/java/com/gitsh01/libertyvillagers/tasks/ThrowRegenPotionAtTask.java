@@ -1,14 +1,12 @@
 package com.gitsh01.libertyvillagers.tasks;
 
 import com.google.common.collect.Lists;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -57,9 +55,8 @@ public class ThrowRegenPotionAtTask extends HealTargetTask {
         double f = currentPatient.getZ() + vec3d.z - villagerEntity.getZ();
         double g = Math.sqrt(d * d + f * f);
 
-        Potion potion = Potions.REGENERATION;
         PotionEntity potionEntity = new PotionEntity(serverWorld, villagerEntity);
-        potionEntity.setItem(PotionUtil.setPotion(new ItemStack(Items.SPLASH_POTION), potion));
+        potionEntity.setItem(PotionContentsComponent.createStack(Items.SPLASH_POTION, Potions.REGENERATION));
         potionEntity.setPitch(potionEntity.getPitch() + 20.0f);
         potionEntity.setVelocity(d, e + g * 0.2, f, 0.75f, 8.0f);
         serverWorld.playSound(null, villagerEntity.getX(), villagerEntity.getY(), villagerEntity.getZ(),

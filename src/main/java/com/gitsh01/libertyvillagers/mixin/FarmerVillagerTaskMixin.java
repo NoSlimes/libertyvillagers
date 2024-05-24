@@ -1,5 +1,6 @@
 package com.gitsh01.libertyvillagers.mixin;
 
+import com.gitsh01.libertyvillagers.ReflectionHelper;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
 import net.minecraft.entity.ai.brain.BlockPosLookTarget;
@@ -11,6 +12,8 @@ import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -31,7 +34,7 @@ import java.util.List;
 import static com.gitsh01.libertyvillagers.LibertyVillagersMod.CONFIG;
 
 @Mixin(FarmerVillagerTask.class)
-public abstract class FarmerVillagerTaskMixin  {
+public abstract class FarmerVillagerTaskMixin {
     private static final int MAX_RUN_TIME = 20 * 60; // One minute.
 
     @Shadow
@@ -84,11 +87,19 @@ public abstract class FarmerVillagerTaskMixin  {
         }
     }
 
+    private boolean isGourd(Block block) {
+        return block instanceof PumpkinBlock || isMelon(block);
+    }
+
+    private boolean isMelon(Block block) {
+        return Registries.BLOCK.getId(block).equals(Registries.BLOCK.getId(Blocks.MELON));
+    }
+
     @Inject(method = "keepRunning", at = @At(value = "HEAD"), cancellable = true)
     protected void keepRunning(ServerWorld serverWorld, VillagerEntity villagerEntity, long l, CallbackInfo cir) {
         if (!CONFIG.villagersProfessionConfig.preferPlantSameCrop &&
-            !CONFIG.villagersProfessionConfig.farmersHarvestPumpkins &&
-            !CONFIG.villagersProfessionConfig.farmersHarvestMelons) {
+                !CONFIG.villagersProfessionConfig.farmersHarvestPumpkins &&
+                !CONFIG.villagersProfessionConfig.farmersHarvestMelons) {
             // Use default logic.
             return;
         }
@@ -115,13 +126,11 @@ public abstract class FarmerVillagerTaskMixin  {
                 }
             }
 
-            if (block instanceof GourdBlock) {
-                if (CONFIG.villagersProfessionConfig.farmersHarvestMelons && block instanceof MelonBlock) {
-                    foundBlockCrop = true;
-                }
-                if (CONFIG.villagersProfessionConfig.farmersHarvestPumpkins && block instanceof PumpkinBlock) {
-                    foundBlockCrop = true;
-                }
+            if (CONFIG.villagersProfessionConfig.farmersHarvestMelons && isMelon(block)) {
+                foundBlockCrop = true;
+            }
+            if (CONFIG.villagersProfessionConfig.farmersHarvestPumpkins && block instanceof PumpkinBlock) {
+                foundBlockCrop = true;
             }
 
             if (foundBlockCrop) {
@@ -139,8 +148,7 @@ public abstract class FarmerVillagerTaskMixin  {
                             currentTarget.add(4, 1, 4))) {
                         BlockState possibleCropState = serverWorld.getBlockState(blockPos);
                         Block possibleCrop = possibleCropState.getBlock();
-                        if (possibleCrop instanceof CropBlock || possibleCrop instanceof GourdBlock ||
-                                possibleCrop instanceof StemBlock) {
+                        if (possibleCrop instanceof CropBlock || isGourd(possibleCrop) || possibleCrop instanceof StemBlock) {
                             preferredSeeds = getPreferredSeedsForCropBlock(possibleCrop);
                             if (preferredSeeds != null) {
                                 break;
@@ -200,7 +208,7 @@ public abstract class FarmerVillagerTaskMixin  {
         if (this.currentTarget != null) {
             this.nextResponseTime = l + 20L;
             int completionRange = 0;
-            if (serverWorld.getBlockState(this.currentTarget).getBlock() instanceof GourdBlock) {
+            if (isGourd(serverWorld.getBlockState(this.currentTarget).getBlock())) {
                 completionRange = 2;
             }
             villagerEntity.getBrain().remember(MemoryModuleType.WALK_TARGET,
@@ -214,8 +222,14 @@ public abstract class FarmerVillagerTaskMixin  {
     }
 
     private Item getPreferredSeedsForCropBlock(Block block) {
-        if (block instanceof StemBlock) {
-            block = ((StemBlock)block).getGourdBlock();
+        if (CONFIG.villagersProfessionConfig.farmersHarvestMelons && block instanceof AttachedStemBlock) {
+            RegistryKey<Block> blockKey = (RegistryKey<Block>)ReflectionHelper.getPrivateField(block, "gourdBlock");
+
+            if (blockKey.equals(BlockKeys.MELON)) {
+                return Items.MELON_SEEDS;
+            } else {
+                return Items.PUMPKIN_SEEDS;
+            }
         }
 
         if (block instanceof BeetrootsBlock) {
@@ -224,7 +238,7 @@ public abstract class FarmerVillagerTaskMixin  {
             return Items.POTATO;
         } else if (block instanceof CarrotsBlock) {
             return Items.CARROT;
-        } else if (CONFIG.villagersProfessionConfig.farmersHarvestMelons && block instanceof MelonBlock) {
+        } else if (CONFIG.villagersProfessionConfig.farmersHarvestMelons && isMelon(block)) {
             return Items.MELON_SEEDS;
         } else if (CONFIG.villagersProfessionConfig.farmersHarvestPumpkins && block instanceof PumpkinBlock) {
             return Items.PUMPKIN_SEEDS;
@@ -277,7 +291,7 @@ public abstract class FarmerVillagerTaskMixin  {
         BlockState blockState = world.getBlockState(pos);
         Block block = blockState.getBlock();
         Block block2 = world.getBlockState(pos.down()).getBlock();
-        if (CONFIG.villagersProfessionConfig.farmersHarvestMelons && block instanceof MelonBlock) {
+        if (CONFIG.villagersProfessionConfig.farmersHarvestMelons && isMelon(block)) {
             return true;
         }
         if (CONFIG.villagersProfessionConfig.farmersHarvestPumpkins && block instanceof PumpkinBlock) {

@@ -6,6 +6,7 @@ import com.gitsh01.libertyvillagers.LibertyVillagersServerInitializer;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.passive.CatEntity;
@@ -14,13 +15,12 @@ import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.text.RawFilteredPair;
 import net.minecraft.text.Text;
 import net.minecraft.village.VillagerProfession;
 import net.minecraft.world.poi.PointOfInterest;
@@ -69,15 +69,10 @@ public class VillagerStats {
         ServerPlayerEntity player = source.getPlayer();
         ServerWorld serverWorld = source.getWorld();
 
-        ItemStack bookStack = new ItemStack(Items.WRITTEN_BOOK);
-        bookStack.setSubNbt("title",
-                NbtString.of(Text.translatable("text.LibertyVillagers.villagerStats.title").getString()));
-        bookStack.setSubNbt("author", NbtString.of(player.getEntityName()));
-
         List<VillagerEntity> villagers = serverWorld.getNonSpectatingEntities(VillagerEntity.class,
                 player.getBoundingBox().expand(CONFIG.debugConfig.villagerStatRange));
 
-        NbtList pages = new NbtList();
+        List<RawFilteredPair<Text>> pages = new LinkedList<>();
         pages.addAll(splitToPageTags(titlePage(player, villagers, serverWorld)));
         pages.addAll(splitToPageTags(professionPage(villagers)));
         pages.addAll(splitToPageTags(heldWorkstationPage(player, serverWorld)));
@@ -86,7 +81,15 @@ public class VillagerStats {
         pages.addAll(splitToPageTags(availableBedsPage(player, serverWorld)));
         pages.addAll(splitToPageTags(golems(player, serverWorld)));
         pages.addAll(splitToPageTags(cats(player, serverWorld)));
-        bookStack.setSubNbt("pages", pages);
+
+        ItemStack bookStack = new ItemStack(Items.WRITTEN_BOOK);
+        WrittenBookContentComponent bookContent = new WrittenBookContentComponent(
+                RawFilteredPair.of(Text.translatable("text.LibertyVillagers.villagerStats.title").getString()),
+                Objects.requireNonNull(player.getDisplayName()).toString(),
+                0,
+                pages,
+                true
+        );
 
         if (LibertyVillagersMod.isClient()) {
             LibertyVillagersClientInitializer.openBookScreen(bookStack);
@@ -101,11 +104,11 @@ public class VillagerStats {
     }
 
 
-    private static Collection<NbtString> splitToPageTags(String string) {
+    private static Collection<RawFilteredPair<Text>> splitToPageTags(String string) {
         final List<String> lines = LibertyVillagersMod.isClient() ? LibertyVillagersClientInitializer.wrapText(string) :
                 LibertyVillagersServerInitializer.wrapText(string);
 
-        List<NbtString> pageTags = new LinkedList<>();
+        List<RawFilteredPair<Text>> pageTags = new LinkedList<>();
 
         int linesRemaining = LINES_PER_PAGE;
         StringBuilder curString = new StringBuilder();
@@ -114,13 +117,13 @@ public class VillagerStats {
             linesRemaining--;
             if (linesRemaining <= 0) {
                 linesRemaining = LINES_PER_PAGE;
-                pageTags.add(NbtString.of("\"" + curString + "\""));
+                pageTags.add(RawFilteredPair.of(Text.of("\"" + curString + "\"")));
                 curString = new StringBuilder();
             }
         }
 
-        if (curString.length() > 0) {
-            pageTags.add(NbtString.of("\"" + curString + "\""));
+        if (!curString.isEmpty()) {
+            pageTags.add(RawFilteredPair.of(Text.of("\"" + curString + "\"")));
         }
 
         return pageTags;
@@ -371,7 +374,7 @@ public class VillagerStats {
         if (cats.size() > 0) {
             for (CatEntity cat : cats) {
                 String variant =
-                        translatedCatVariant(Registries.CAT_VARIANT.getId(cat.getVariant()).toShortTranslationKey());
+                        translatedCatVariant(Registries.CAT_VARIANT.getId(cat.getVariant().value()).toShortTranslationKey());
                 catVariantMap.merge(variant, 1, Integer::sum);
             }
 

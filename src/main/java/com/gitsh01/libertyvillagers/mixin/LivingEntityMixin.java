@@ -5,6 +5,7 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,9 +39,8 @@ public abstract class LivingEntityMixin extends Entity {
         }
     }
 
-    @Inject(method = "getAttributeValue(Lnet/minecraft/entity/attribute/EntityAttribute;)D", at = @At(value = "HEAD"),
-            cancellable = true)
-    public void replaceAttributeValueForVillagersAndGolems(EntityAttribute attribute,
+    @Inject(method = "getAttributeValue", at = @At(value = "HEAD"), cancellable = true)
+        public void replaceAttributeValueForVillagersAndGolems(RegistryEntry<EntityAttribute> attribute,
                                                          CallbackInfoReturnable<Double> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity == null) return;

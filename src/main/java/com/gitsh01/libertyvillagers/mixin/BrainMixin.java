@@ -100,12 +100,12 @@ public abstract class BrainMixin<E extends LivingEntity> {
          } else if (type == MemoryModuleType.HOME || type ==
                 MemoryModuleType.POTENTIAL_JOB_SITE || type == MemoryModuleType.JOB_SITE) {
             GlobalPos globalPos = (GlobalPos)memory.get().getValue();
-            target = new StringBuilder(String.format("Position set to %s", globalPos.getPos().toShortString()));
+            target = new StringBuilder(String.format("Position set to %s", globalPos.pos().toShortString()));
         } else if (type == MemoryModuleType.SECONDARY_JOB_SITE) {
             List<GlobalPos> globalPosList;
             globalPosList = (List<GlobalPos>)memory.get().getValue();
             for (GlobalPos globalPos : globalPosList) {
-                target.append("{ ").append(globalPos.getPos().toShortString()).append(" } ");
+                target.append("{ ").append(globalPos.pos().toShortString()).append(" } ");
             }
         } else if (type == MemoryModuleType.PATH) {
             Path path = (Path)memory.get().getValue();

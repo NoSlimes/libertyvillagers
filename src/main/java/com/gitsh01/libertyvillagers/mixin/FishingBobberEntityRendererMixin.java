@@ -1,5 +1,6 @@
 package com.gitsh01.libertyvillagers.mixin;
 
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -31,11 +32,6 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
     }
 
     @Shadow
-    private static void vertex(VertexConsumer buffer, Matrix4f matrix, Matrix3f normalMatrix, int light, float x, int y,
-                               int u, int v) {
-    }
-
-    @Shadow
     private static float percentage(int value, int max) {
         return 0;
     }
@@ -50,12 +46,16 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         float k = z * segmentEnd - h;
         float l = MathHelper.sqrt(i * i + j * j + k * k);
         buffer.vertex(matrices.getPositionMatrix(), f, g, h).color(0, 0, 0, 255)
-                .normal(matrices.getNormalMatrix(), i /= l, j /= l, k /= l).next();
+                .normal(matrices, i /= l, j /= l, k /= l).next();
         // Switching from line strip to line, so add doubles of all the intermediate points. 0->1, 1->2, 2->3.
         if ((segmentStart != 0) && (segmentStart != 1.0f)) {
             buffer.vertex(matrices.getPositionMatrix(), f, g, h).color(0, 0, 0, 255)
-                    .normal(matrices.getNormalMatrix(), i, j, k).next();
+                    .normal(matrices, i, j, k).next();
         }
+    }
+
+    private static void vertex(VertexConsumer buffer, MatrixStack.Entry matrix, int light, float x, int y, int u, int v) {
+        buffer.vertex(matrix, x - 0.5f, (float) y - 0.5f, 0.0f).color(255, 255, 255, 255).texture(u, v).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(matrix, 0.0f, 1.0f, 0.0f).next();
     }
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
@@ -78,13 +78,11 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         matrixStack.multiply(this.dispatcher.getRotation());
         matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
         MatrixStack.Entry entry = matrixStack.peek();
-        Matrix4f matrix4f = entry.getPositionMatrix();
-        Matrix3f matrix3f = entry.getNormalMatrix();
         VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(LAYER);
-        FishingBobberEntityRendererMixin.vertex(vertexConsumer, matrix4f, matrix3f, i, 0.0f, 0, 0, 1);
-        FishingBobberEntityRendererMixin.vertex(vertexConsumer, matrix4f, matrix3f, i, 1.0f, 0, 1, 1);
-        FishingBobberEntityRendererMixin.vertex(vertexConsumer, matrix4f, matrix3f, i, 1.0f, 1, 1, 0);
-        FishingBobberEntityRendererMixin.vertex(vertexConsumer, matrix4f, matrix3f, i, 0.0f, 1, 0, 0);
+        vertex(vertexConsumer, entry, i, 0.0f, 0, 0, 1);
+        vertex(vertexConsumer, entry, i, 1.0f, 0, 1, 1);
+        vertex(vertexConsumer, entry, i, 1.0f, 1, 1, 0);
+        vertex(vertexConsumer, entry, i, 0.0f, 1, 0, 0);
         matrixStack.pop();
         float l = MathHelper.lerp(g, villager.prevBodyYaw, villager.bodyYaw) * ((float) Math.PI / 180);
         double d = MathHelper.sin(l);

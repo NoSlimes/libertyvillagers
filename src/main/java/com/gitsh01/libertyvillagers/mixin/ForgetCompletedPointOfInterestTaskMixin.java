@@ -28,9 +28,9 @@ public abstract class ForgetCompletedPointOfInterestTaskMixin  {
                              CallbackInfoReturnable<Boolean> cir) {
         @SuppressWarnings("unchecked")
         GlobalPos globalPos = (GlobalPos)context.getValue(poiPos);
-        BlockPos blockPos = globalPos.getPos();
+        BlockPos blockPos = globalPos.pos();
         // Replace isWithinDistance with the Manhattan distance to avoid being confused by beds placed near stairs.
-        if (world.getRegistryKey() != globalPos.getDimension() ||  (blockPos.getManhattanDistance(entity.getBlockPos()) >= 4))  {
+        if (world.getRegistryKey() != globalPos.dimension() ||  (blockPos.getManhattanDistance(entity.getBlockPos()) >= 4))  {
             cir.setReturnValue(false);
             cir.cancel();
         }

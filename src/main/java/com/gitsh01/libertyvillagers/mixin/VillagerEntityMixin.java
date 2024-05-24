@@ -136,16 +136,16 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
     public void releaseTicketFor(Brain<VillagerEntity> brain, ServerWorld world, MemoryModuleType<GlobalPos> memoryModuleType) {
         MinecraftServer minecraftServer = world.getServer();
         brain.getOptionalMemory(memoryModuleType).ifPresent(pos -> {
-            ServerWorld serverWorld = minecraftServer.getWorld(pos.getDimension());
+            ServerWorld serverWorld = minecraftServer.getWorld(pos.dimension());
             if (serverWorld == null) {
                 return;
             }
             PointOfInterestStorage pointOfInterestStorage = serverWorld.getPointOfInterestStorage();
-            Optional<RegistryEntry<PointOfInterestType>> optional = pointOfInterestStorage.getType(pos.getPos());
+            Optional<RegistryEntry<PointOfInterestType>> optional = pointOfInterestStorage.getType(pos.pos());
             BiPredicate<VillagerEntity, RegistryEntry<PointOfInterestType>> biPredicate = POINTS_OF_INTEREST.get(memoryModuleType);
             if (optional.isPresent() && biPredicate.test((VillagerEntity) ((Object) this), optional.get())) {
-                pointOfInterestStorage.releaseTicket(pos.getPos());
-                DebugInfoSender.sendPointOfInterest(serverWorld, pos.getPos());
+                pointOfInterestStorage.releaseTicket(pos.pos());
+                DebugInfoSender.sendPointOfInterest(serverWorld, pos.pos());
             }
         });
     }
