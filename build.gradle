@@ -36,11 +36,6 @@ repositories {
 	maven {
 		url "https://maven.terraformersmc.com/releases/"
 	}
-
-	// For server-translations.
-	maven {
-		url "https://maven.nucleoid.xyz"
-	}
 }
 
 dependencies {
@@ -61,9 +56,6 @@ dependencies {
 	modImplementation("com.terraformersmc:modmenu:${project.mod_menu_version}") {
 		exclude module: 'fabric-api' // includes bad Fabric API
 	}
-
-	// Server-Translations.
-	modImplementation include("xyz.nucleoid:server-translations-api:${project.min_server_translations_version}")
 }
 
 processResources {

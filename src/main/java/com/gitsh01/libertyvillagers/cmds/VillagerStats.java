@@ -94,12 +94,8 @@ public class VillagerStats {
         if (LibertyVillagersMod.isClient()) {
             LibertyVillagersClientInitializer.openBookScreen(bookStack);
         } else {
-            if (FabricLoader.getInstance().getModContainer("server_translations_api").isEmpty()) {
-                player.sendMessage(Text.of("Server_translations_api is missing. VillagerStats does not work " +
-                        "server-side without translations."));
-                return;
-            }
-            LibertyVillagersServerInitializer.openBookScreen(bookStack, player);
+
+//            LibertyVillagersServerInitializer.openBookScreen(bookStack, player);
         }
     }
 
