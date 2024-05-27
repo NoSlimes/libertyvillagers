@@ -1,3 +1,8 @@
+## [1.0.16+fabric+1.20.6]
+
+### Features
+
+- Many, many thanks to Mechazawa for adding support. Temporarily the server translations have been disabled due to lack of 1.20.6 support, Mechazawa hopes to fix that soon. Since this is a port of the fabric-only version, forge support is not currently available.
 
 ## [1.0.14+fabric+1.19.4](https://gitlab.com/html-validate/html-validate/compare/1.0.14+fabric+1.19.4) (2023-04-16)
 

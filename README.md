@@ -111,3 +111,5 @@ server.
 
 Thanks to kressety for the Simplified Chinese translations.
 Thanks to Cape-City for the German translations.
+
+Thanks to Mechazawa for the 1.20.6 fabric version.
