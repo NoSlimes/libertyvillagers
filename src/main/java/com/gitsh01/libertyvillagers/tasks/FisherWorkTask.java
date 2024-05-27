@@ -22,7 +22,7 @@ public class FisherWorkTask extends VillagerWorkTask {
             return;
         }
         GlobalPos globalPos = optional.get();
-        BlockState blockState = world.getBlockState(globalPos.getPos());
+        BlockState blockState = world.getBlockState(globalPos.pos());
         if (blockState.isOf(Blocks.BARREL)) {
             this.cookAndDropFish(entity);
         }
