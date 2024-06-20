@@ -6,6 +6,8 @@ import com.gitsh01.libertyvillagers.LibertyVillagersServerInitializer;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.component.ComponentMap;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.WrittenBookContentComponent;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
@@ -91,11 +93,16 @@ public class VillagerStats {
                 true
         );
 
+        bookStack.set(DataComponentTypes.WRITTEN_BOOK_CONTENT, bookContent);
+
         if (LibertyVillagersMod.isClient()) {
             LibertyVillagersClientInitializer.openBookScreen(bookStack);
+        } else if (FabricLoader.getInstance().getModContainer("server_translations_api").isPresent()) {
+            LibertyVillagersServerInitializer.openBookScreen(bookStack, player);
         } else {
-
-//            LibertyVillagersServerInitializer.openBookScreen(bookStack, player);
+            player.sendMessage(Text.of(
+                "Server_translations_api is missing. VillagerStats does not work server-side without translations."
+            ));
         }
     }
 
@@ -113,13 +120,13 @@ public class VillagerStats {
             linesRemaining--;
             if (linesRemaining <= 0) {
                 linesRemaining = LINES_PER_PAGE;
-                pageTags.add(RawFilteredPair.of(Text.of("\"" + curString + "\"")));
+                pageTags.add(RawFilteredPair.of(Text.of(curString.toString())));
                 curString = new StringBuilder();
             }
         }
 
         if (!curString.isEmpty()) {
-            pageTags.add(RawFilteredPair.of(Text.of("\"" + curString + "\"")));
+            pageTags.add(RawFilteredPair.of(Text.of(curString.toString())));
         }
 
         return pageTags;

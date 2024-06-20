@@ -13,10 +13,10 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RotationAxis;
-import org.joml.Matrix3f;
-import org.joml.Matrix4f;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,6 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(FishingBobberEntityRenderer.class)
 public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<FishingBobberEntity> {
 
+    @Final
     @Shadow
     private static RenderLayer LAYER;
 
@@ -36,6 +37,7 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         return 0;
     }
 
+    @Unique
     private static void renderFishingLineAsLine(float x, float y, float z, VertexConsumer buffer,
                                                 MatrixStack.Entry matrices, float segmentStart, float segmentEnd) {
         float f = x * segmentStart;
@@ -45,17 +47,28 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
         float j = y * (segmentEnd * segmentEnd + segmentEnd) * 0.5f + 0.25f - g;
         float k = z * segmentEnd - h;
         float l = MathHelper.sqrt(i * i + j * j + k * k);
-        buffer.vertex(matrices.getPositionMatrix(), f, g, h).color(0, 0, 0, 255)
-                .normal(matrices, i /= l, j /= l, k /= l).next();
+
+        // Todo TEST if vertex is automatically consumed
+        buffer.vertex(matrices.getPositionMatrix(), f, g, h)
+                .color(0, 0, 0, 255)
+                .normal(matrices, i /= l, j /= l, k /= l);
+
         // Switching from line strip to line, so add doubles of all the intermediate points. 0->1, 1->2, 2->3.
         if ((segmentStart != 0) && (segmentStart != 1.0f)) {
-            buffer.vertex(matrices.getPositionMatrix(), f, g, h).color(0, 0, 0, 255)
-                    .normal(matrices, i, j, k).next();
+            buffer.vertex(matrices.getPositionMatrix(), f, g, h)
+                    .color(0, 0, 0, 255)
+                    .normal(matrices, i, j, k);
         }
     }
 
+    @Unique
     private static void vertex(VertexConsumer buffer, MatrixStack.Entry matrix, int light, float x, int y, int u, int v) {
-        buffer.vertex(matrix, x - 0.5f, (float) y - 0.5f, 0.0f).color(255, 255, 255, 255).texture(u, v).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(matrix, 0.0f, 1.0f, 0.0f).next();
+        buffer.vertex(matrix, x - 0.5f, (float) y - 0.5f, 0.0f)
+                .color(255, 255, 255, 255)
+                .texture(u, v)
+                .overlay(OverlayTexture.DEFAULT_UV)
+                .light(light)
+                .normal(matrix, 0.0f, 1.0f, 0.0f);
     }
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
