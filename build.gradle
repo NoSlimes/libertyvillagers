@@ -126,6 +126,7 @@ githubRelease {
 	FilenameFilter filter = { dir, filename -> filename.contains(project.version) && !filename.contains('-dev.jar') }
 	releaseAssets = { jar.destinationDirectory.asFile.get().listFiles filter }
 }
+tasks.githubRelease.dependsOn(tasks.sourcesJar)
 
 import com.modrinth.minotaur.dependencies.ModDependency
 
@@ -143,7 +144,7 @@ modrinth {
 	]
 	syncBodyFrom = rootProject.file("README.md").text
 }
-tasks.modrinth.dependsOn(tasks.modrinthSyncBody)
+tasks.modrinth.dependsOn(tasks.modrinthSyncBody, tasks.sourcesJar)
 
 curseforge {
 	if (project.getProjectProperty('curse_key') != null) {
@@ -214,6 +215,7 @@ curseforge {
 		}
 	}
 }
+tasks.curseforge.dependsOn(tasks.sourcesJar)
 
 task gitChangelogTask(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
 	file = file("changelog.md")
@@ -253,7 +255,7 @@ task gitChangelogTask(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
  """
 }
 
-task release(dependsOn: [tasks.githubRelease, tasks.curseforge, tasks.modrinth]) {
+task release(dependsOn: [tasks.sourcesJar, tasks.build, tasks.githubRelease, tasks.curseforge, tasks.modrinth]) {
 	group = 'publishing'
 	description = 'Releases a new version to Github, Modrinth, and Curseforge'
 }
