@@ -5,7 +5,7 @@ import net.minecraft.entity.ai.NoPenaltyTargeting;
 import net.minecraft.entity.ai.brain.BlockPosLookTarget;
 import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.WalkTarget;
-import net.minecraft.entity.ai.brain.task.WanderAroundTask;
+import net.minecraft.entity.ai.brain.task.MoveToTargetTask;
 import net.minecraft.entity.ai.pathing.LandPathNodeMaker;
 import net.minecraft.entity.ai.pathing.Path;
 import net.minecraft.entity.mob.MobEntity;
@@ -24,8 +24,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import static com.gitsh01.libertyvillagers.LibertyVillagersMod.CONFIG;
 
-@Mixin(WanderAroundTask.class)
-public abstract class WanderAroundTaskMixin {
+@Mixin(MoveToTargetTask.class)
+public abstract class MoveToTargetTaskMixin {
 
     static private final int MAX_RUN_TIME = 20 * 60; // One minute.
     static private final long STUCK_TIME = 20 * 3; // Three seconds.

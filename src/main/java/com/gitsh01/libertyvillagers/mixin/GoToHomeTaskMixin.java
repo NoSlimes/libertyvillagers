@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.longs.Long2LongMap;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.ai.brain.MemoryQueryResult;
-import net.minecraft.entity.ai.brain.task.WalkHomeTask;
+import net.minecraft.entity.ai.brain.task.GoToHomeTask;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.BlockTags;
@@ -27,8 +27,8 @@ import java.util.stream.Stream;
 
 import static com.gitsh01.libertyvillagers.LibertyVillagersMod.CONFIG;
 
-@Mixin(WalkHomeTask.class)
-public abstract class WalkHomeTaskMixin {
+@Mixin(GoToHomeTask.class)
+public abstract class GoToHomeTaskMixin {
 
     private static ServerWorld world;
 

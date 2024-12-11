@@ -2,6 +2,7 @@ package com.gitsh01.libertyvillagers.tasks;
 
 import com.google.common.collect.Lists;
 import net.minecraft.component.type.PotionContentsComponent;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -55,7 +56,9 @@ public class ThrowRegenPotionAtTask extends HealTargetTask {
         double f = currentPatient.getZ() + vec3d.z - villagerEntity.getZ();
         double g = Math.sqrt(d * d + f * f);
 
-        PotionEntity potionEntity = new PotionEntity(serverWorld, villagerEntity);
+        PotionEntity potionEntity = new PotionEntity(EntityType.POTION, serverWorld);
+        potionEntity.setPos(villagerEntity.getX(), villagerEntity.getY(), villagerEntity.getZ());
+
         potionEntity.setItem(PotionContentsComponent.createStack(Items.SPLASH_POTION, Potions.REGENERATION));
         potionEntity.setPitch(potionEntity.getPitch() + 20.0f);
         potionEntity.setVelocity(d, e + g * 0.2, f, 0.75f, 8.0f);

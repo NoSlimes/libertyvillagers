@@ -1,7 +1,7 @@
 //file:noinspection UnnecessaryQualifiedReference
 //file:noinspection GroovyMissingReturnStatement
 plugins {
-	id 'fabric-loom' version '1.6.+'
+	id 'fabric-loom' version '1.9.+'
 	id 'maven-publish'
 	id "com.modrinth.minotaur" version "2.+"
 	id "com.github.breadmoirai.github-release" version "2.4.1"

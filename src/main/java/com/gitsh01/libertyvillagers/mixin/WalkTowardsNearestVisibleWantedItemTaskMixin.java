@@ -5,7 +5,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.brain.MemoryQueryResult;
 import net.minecraft.entity.ai.brain.task.TaskTriggerer;
-import net.minecraft.entity.ai.brain.task.WalkToNearestVisibleWantedItemTask;
+import net.minecraft.entity.ai.brain.task.WalkTowardsNearestVisibleWantedItemTask;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
@@ -16,8 +16,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Predicate;
 
-@Mixin(WalkToNearestVisibleWantedItemTask.class)
-public abstract class WalkToNearestVisibleWantedItemTaskMixin {
+@Mixin(WalkTowardsNearestVisibleWantedItemTask.class)
+public abstract class WalkTowardsNearestVisibleWantedItemTaskMixin {
 
     // Injecting into the lambda of the TaskTriggerer.
     @SuppressWarnings({"target", "descriptor"})

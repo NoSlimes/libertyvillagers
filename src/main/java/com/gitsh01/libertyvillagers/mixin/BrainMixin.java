@@ -39,7 +39,7 @@ public abstract class BrainMixin<E extends LivingEntity> {
 
     @SuppressWarnings("unchecked")
     @Inject(method = "setMemory(Lnet/minecraft/entity/ai/brain/MemoryModuleType;Ljava/util/Optional;)V",
-            at = @At(value = "Head"))
+            at = @At(value = "HEAD"))
     <U> void setMemory(MemoryModuleType<U> type, Optional<? extends Memory<?>> memory, CallbackInfo ci) {
         if (!CONFIG.debugConfig.enableVillagerBrainDebug) {
             return;

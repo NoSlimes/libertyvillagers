@@ -45,7 +45,7 @@ public abstract class LivingEntityMixin extends Entity {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity == null) return;
         if ((entity.getType() == EntityType.VILLAGER || entity.getType() == EntityType.IRON_GOLEM) &&
-                attribute == EntityAttributes.GENERIC_FOLLOW_RANGE) {
+                attribute == EntityAttributes.FOLLOW_RANGE) {
             cir.setReturnValue((double) CONFIG.villagerPathfindingConfig.findPOIRange);
             cir.cancel();
         }

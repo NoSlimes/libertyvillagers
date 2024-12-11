@@ -42,7 +42,7 @@ public abstract class CatEntityMixin extends TameableEntity {
 
         if (CONFIG.catsConfig.allBlackCats) {
             Registries.CAT_VARIANT
-                    .getEntry(CatVariant.ALL_BLACK)
+                    .getEntry(CatVariant.ALL_BLACK.getValue())
                     .ifPresent(this::setVariant);
         }
     }

@@ -35,13 +35,13 @@ public abstract class VillagerTaskListProviderMixin {
         throw new AssertionError();
     }
 
-    @Inject(method = "createWorkTasks", at = @At("Head"), cancellable = true)
+    @Inject(method = "createWorkTasks", at = @At("HEAD"), cancellable = true)
     private static void replaceCreateWorkTasks(VillagerProfession profession, float speed,
                                                CallbackInfoReturnable<List<Pair<Integer, ? extends Task<? super VillagerEntity>>>> cir) {
         Task<? super VillagerEntity> villagerWorkTask = new VillagerWorkTask(); // Plays working sounds on the job site.
         Task<? super VillagerEntity> secondaryWorkTask = null;
         // GoToIfNearby makes the villager wander around the job site.
-        Task<? super VillagerEntity> thirdWorkTask = GoToIfNearbyTask.create(MemoryModuleType.JOB_SITE, 0.4f, 4);
+        Task<? super VillagerEntity> thirdWorkTask = GoAroundTask.create(MemoryModuleType.JOB_SITE, 0.4f, 4);
         switch (profession.toString()) {
             case "armorer":
                 if (CONFIG.villagersProfessionConfig.armorerHealsGolems) {
@@ -124,8 +124,7 @@ public abstract class VillagerTaskListProviderMixin {
 
         ArrayList<Pair<Task<? super VillagerEntity>, Integer>> randomTasks = new ArrayList<>(
                 ImmutableList.of(Pair.of(villagerWorkTask, PRIMARY_WORK_TASK_PRIORITY),
-                        Pair.of(GoToNearbyPositionTask.create(MemoryModuleType.JOB_SITE, 0.4f,
-                                CONFIG.villagerPathfindingConfig.minimumPOISearchDistance, 10), 5),
+                        Pair.of(GoAroundTask.create(MemoryModuleType.JOB_SITE, 0.4f, 10), 5),
                         Pair.of(GoToSecondaryPositionTask.create(MemoryModuleType.SECONDARY_JOB_SITE, speed,
                                 CONFIG.villagerPathfindingConfig.minimumPOISearchDistance, 6,
                                 MemoryModuleType.JOB_SITE), 5)));

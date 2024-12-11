@@ -1,5 +1,18 @@
 package com.gitsh01.libertyvillagers.mixin;
 
+/*
+ * This mixin modifies the ModelPredicateProviderRegistry class to add custom model predicate behavior.
+ * However, the ModelPredicateProviderRegistry class has been deprecated and removed from Fabric.
+ *
+ * This mixin is now obsolete and will not be executed as the target class no longer exists in the Fabric API.
+ * The code below has been commented out, but it can be restored if the target class or a similar functionality
+ * becomes available in future versions.
+ *
+ * Please remove this class completely once it's confirmed that there is no more need for it.
+ */
+
+// Commented out due to deprecation and removal of ModelPredicateProviderRegistry class
+/*
 import com.google.common.collect.Maps;
 import net.minecraft.client.item.ClampedModelPredicateProvider;
 import net.minecraft.client.item.ModelPredicateProvider;
@@ -43,3 +56,5 @@ public class ModelPredicateProviderRegistryMixin {
         ci.cancel();
     }
 }
+*/
+

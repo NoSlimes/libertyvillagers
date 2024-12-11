@@ -7,6 +7,8 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.FishingBobberEntityRenderer;
+import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.render.entity.state.FishingBobberEntityState;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.passive.VillagerEntity;
@@ -22,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(FishingBobberEntityRenderer.class)
-public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<FishingBobberEntity> {
+public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<FishingBobberEntity, FishingBobberEntityState> {
 
     @Final
     @Shadow
@@ -71,58 +73,62 @@ public abstract class FishingBobberEntityRendererMixin extends EntityRenderer<Fi
                 .normal(matrix, 0.0f, 1.0f, 0.0f);
     }
 
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    public void render(FishingBobberEntity fishingBobberEntity, float f, float g, MatrixStack matrixStack,
-                       VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
-        double s;
-        double q;
-        double p;
-        double o;
-        if (fishingBobberEntity.getOwner() == null) {
-            return;
-        }
-        if (fishingBobberEntity.getOwner().getType() != EntityType.VILLAGER) {
-            return;
-        }
-        VillagerEntity villager = (VillagerEntity) fishingBobberEntity.getOwner();
-        matrixStack.push();
-        matrixStack.push();
-        matrixStack.scale(0.5f, 0.5f, 0.5f);
-        matrixStack.multiply(this.dispatcher.getRotation());
-        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
-        MatrixStack.Entry entry = matrixStack.peek();
-        VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(LAYER);
-        vertex(vertexConsumer, entry, i, 0.0f, 0, 0, 1);
-        vertex(vertexConsumer, entry, i, 1.0f, 0, 1, 1);
-        vertex(vertexConsumer, entry, i, 1.0f, 1, 1, 0);
-        vertex(vertexConsumer, entry, i, 0.0f, 1, 0, 0);
-        matrixStack.pop();
-        float l = MathHelper.lerp(g, villager.prevBodyYaw, villager.bodyYaw) * ((float) Math.PI / 180);
-        double d = MathHelper.sin(l);
-        double e = MathHelper.cos(l);
-        double n = 0.4;
-        o = MathHelper.lerp(g, villager.prevX, villager.getX()) - d * n;
-        p = villager.prevY + (double) villager.getStandingEyeHeight() +
-                (villager.getY() - villager.prevY) * (double) g - 0.45;
-        q = MathHelper.lerp(g, villager.prevZ, villager.getZ()) + e * n;
+//THIS SECTION WAS COMMENTED OUT BECAUSE I COULDN'T WRAP MY HEAD AROUND THE RENDERING CHANGES INTRODUCED IN ONE OF THE 1.21.x VERSIONS
 
-        s = MathHelper.lerp(g, fishingBobberEntity.prevX, fishingBobberEntity.getX());
-        double t = MathHelper.lerp(g, fishingBobberEntity.prevY, fishingBobberEntity.getY()) + 0.25;
-        double u = MathHelper.lerp(g, fishingBobberEntity.prevZ, fishingBobberEntity.getZ());
-        float v = (float) (o - s);
-        float w = (float) (p - t);
-        float x = (float) (q - u);
-        VertexConsumer vertexConsumer2 = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
-        MatrixStack.Entry entry2 = matrixStack.peek();
-        for (int z = 0; z <= 16; ++z) {
-            // There's a bug in 1.19.3 which causes the line strips to not properly end when the layer is
-            // switched, which means a line is drawn from the end of one fishing line to the next fishing line.
-            FishingBobberEntityRendererMixin.renderFishingLineAsLine(v, w, x, vertexConsumer2, entry2,
-                    FishingBobberEntityRendererMixin.percentage(z, 16),
-                    FishingBobberEntityRendererMixin.percentage(z + 1, 16));
-        }
-        matrixStack.pop();
-        super.render(fishingBobberEntity, f, g, matrixStack, vertexConsumerProvider, i);
-        ci.cancel();
-    }
+//    @Inject(method = "render(Lnet/minecraft/client/render/entity/state/FishingBobberEntityState;Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At("HEAD"), cancellable = true)
+//    public void render(FishingBobberEntity fishingBobberEntity, float f, float g, MatrixStack matrixStack,
+//                       VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci) {
+//        double s;
+//        double q;
+//        double p;
+//        double o;
+//        if (fishingBobberEntity.getOwner() == null) {
+//            return;
+//        }
+//        if (fishingBobberEntity.getOwner().getType() != EntityType.VILLAGER) {
+//            return;
+//        }
+//        VillagerEntity villager = (VillagerEntity) fishingBobberEntity.getOwner();
+//        matrixStack.push();
+//        matrixStack.push();
+//        matrixStack.scale(0.5f, 0.5f, 0.5f);
+//        matrixStack.multiply(this.dispatcher.getRotation());
+//        matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0f));
+//        MatrixStack.Entry entry = matrixStack.peek();
+//        VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(LAYER);
+//        vertex(vertexConsumer, entry, i, 0.0f, 0, 0, 1);
+//        vertex(vertexConsumer, entry, i, 1.0f, 0, 1, 1);
+//        vertex(vertexConsumer, entry, i, 1.0f, 1, 1, 0);
+//        vertex(vertexConsumer, entry, i, 0.0f, 1, 0, 0);
+//        matrixStack.pop();
+//        float l = MathHelper.lerp(g, villager.prevBodyYaw, villager.bodyYaw) * ((float) Math.PI / 180);
+//        double d = MathHelper.sin(l);
+//        double e = MathHelper.cos(l);
+//        double n = 0.4;
+//        o = MathHelper.lerp(g, villager.prevX, villager.getX()) - d * n;
+//        p = villager.prevY + (double) villager.getStandingEyeHeight() +
+//                (villager.getY() - villager.prevY) * (double) g - 0.45;
+//        q = MathHelper.lerp(g, villager.prevZ, villager.getZ()) + e * n;
+//
+//        s = MathHelper.lerp(g, fishingBobberEntity.prevX, fishingBobberEntity.getX());
+//        double t = MathHelper.lerp(g, fishingBobberEntity.prevY, fishingBobberEntity.getY()) + 0.25;
+//        double u = MathHelper.lerp(g, fishingBobberEntity.prevZ, fishingBobberEntity.getZ());
+//        float v = (float) (o - s);
+//        float w = (float) (p - t);
+//        float x = (float) (q - u);
+//        VertexConsumer vertexConsumer2 = vertexConsumerProvider.getBuffer(RenderLayer.getLines());
+//        MatrixStack.Entry entry2 = matrixStack.peek();
+//        for (int z = 0; z <= 16; ++z) {
+//            // There's a bug in 1.19.3 which causes the line strips to not properly end when the layer is
+//            // switched, which means a line is drawn from the end of one fishing line to the next fishing line.
+//            FishingBobberEntityRendererMixin.renderFishingLineAsLine(v, w, x, vertexConsumer2, entry2,
+//                    FishingBobberEntityRendererMixin.percentage(z, 16),
+//                    FishingBobberEntityRendererMixin.percentage(z + 1, 16));
+//        }
+//
+//
+//        matrixStack.pop();
+//        super.render(this.createRenderState(), matrixStack, vertexConsumerProvider, i);
+//        ci.cancel();
+//    }
 }

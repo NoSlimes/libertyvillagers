@@ -1,13 +1,13 @@
 package com.gitsh01.libertyvillagers.mixin;
 
-import net.minecraft.entity.ai.brain.task.GoToWorkTask;
+import net.minecraft.entity.ai.brain.task.UpdateJobSiteTask;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.*;
 
 import static com.gitsh01.libertyvillagers.LibertyVillagersMod.CONFIG;
 
-@Mixin(GoToWorkTask.class)
-public class GoToWorkTaskMixin {
+@Mixin(UpdateJobSiteTask.class)
+public class UpdateJobSiteTaskMixin {
 
     // Inject into the lambda called by Task.trigger.
     @SuppressWarnings({"target", "descriptor"})

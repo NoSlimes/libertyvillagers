@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.util.Optional;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import static com.gitsh01.libertyvillagers.LibertyVillagersMod.CONFIG;
@@ -32,16 +33,12 @@ public abstract class FindPointOfInterestTaskMixin {
     // Calling into the lambda for Task.trigger.
     @SuppressWarnings("target")
     @Inject(method = "method_46885",
-           at = @At(value = "Head"), cancellable = true)
-    static private void dontFindWorkstationsAtNight(boolean onlyRunIfChild, MutableLong mutableLong,
-                                                    Long2ObjectMap objectMap,
-                                                    Predicate predicate, MemoryQueryResult result, Optional optional,
-                                                    ServerWorld serverWorld, PathAwareEntity entity, long time,
-                                                    CallbackInfoReturnable<Boolean> cir) {
+           at = @At(value = "HEAD"), cancellable = true)
+    static private void dontFindWorkstationsAtNight(boolean bl, MutableLong mutableLong, Long2ObjectMap long2ObjectMap, Predicate predicate, BiPredicate biPredicate, MemoryQueryResult memoryQueryResult, Optional optional, ServerWorld serverWorld, PathAwareEntity entity, long time, CallbackInfoReturnable<Boolean> cir) {
         lastUsedWorld = serverWorld;
         long timeOfDay = serverWorld.getTimeOfDay() % TICKS_PER_DAY;
         // Let villagers still find beds at night.
-        MemoryQueryResultAccessorMixin accessorMixin = (MemoryQueryResultAccessorMixin) ((Object) result);
+        MemoryQueryResultAccessorMixin accessorMixin = (MemoryQueryResultAccessorMixin) ((Object) memoryQueryResult);
         if (accessorMixin.getMemory() == MemoryModuleType.HOME) {
             return;
         }
@@ -54,7 +51,7 @@ public abstract class FindPointOfInterestTaskMixin {
 
     @SuppressWarnings("target")
     @ModifyArgs(method = "method_46885",
-            at = @At(value = "Invoke", target = "Lnet/minecraft/world/poi/PointOfInterestStorage;" +
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/poi/PointOfInterestStorage;" +
                     "getSortedTypesAndPositions(Ljava/util/function/Predicate;Ljava/util/function/Predicate;Lnet/minecraft/util/math/BlockPos;ILnet/minecraft/world/poi/PointOfInterestStorage$OccupationStatus;)Ljava/util/stream/Stream;"))
     static private void filterForOccupiedBedsAndIncreasePOIRange(Args args) {
         Predicate<BlockPos> oldPredicate = args.get(1);
