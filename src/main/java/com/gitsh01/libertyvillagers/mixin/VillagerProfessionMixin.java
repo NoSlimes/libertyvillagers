@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.text.Text;
 import net.minecraft.village.VillagerProfession;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,13 +19,13 @@ import static com.gitsh01.libertyvillagers.LibertyVillagersMod.CONFIG;
 public abstract class VillagerProfessionMixin {
 
     @Shadow
-    private String id;
+    private Text id;
 
     @Inject(method = "secondaryJobSites",
             at = @At("HEAD"),
             cancellable = true)
     void replaceSecondaryJobSites(CallbackInfoReturnable<ImmutableSet<Block>> cir) {
-        switch (id) {
+        switch (id.toString()) {
             case "librarian" -> {
                 if (CONFIG.villagersProfessionConfig.librariansLookAtBooks) {
                     cir.setReturnValue(ImmutableSet.of(Blocks.BOOKSHELF));
@@ -46,7 +47,7 @@ public abstract class VillagerProfessionMixin {
     void replaceGatherableItems(CallbackInfoReturnable<ImmutableSet<Item>> cir) {
         ImmutableSet<Item> originalSet = cir.getReturnValue();
         ImmutableSet.Builder<Item> setBuilder = ImmutableSet.<Item>builder().addAll(originalSet);
-        switch (id) {
+        switch (id.toString()) {
             case "butcher" -> {
                 if (CONFIG.villagersProfessionConfig.butchersFeedChickens) {
                     setBuilder.addAll(ImmutableSet.of(Items.PUMPKIN_SEEDS, Items.WHEAT_SEEDS, Items.BEETROOT_SEEDS));

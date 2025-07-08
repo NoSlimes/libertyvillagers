@@ -10,6 +10,7 @@ import net.minecraft.entity.ai.brain.MemoryModuleType;
 import net.minecraft.entity.ai.brain.task.*;
 import net.minecraft.entity.passive.*;
 import net.minecraft.item.Items;
+import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.village.VillagerProfession;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
@@ -36,13 +37,14 @@ public abstract class VillagerTaskListProviderMixin {
     }
 
     @Inject(method = "createWorkTasks", at = @At("HEAD"), cancellable = true)
-    private static void replaceCreateWorkTasks(VillagerProfession profession, float speed,
-                                               CallbackInfoReturnable<List<Pair<Integer, ? extends Task<? super VillagerEntity>>>> cir) {
+
+    private static void replaceCreateWorkTasks(RegistryEntry<VillagerProfession> professionEntry, float speed,
+                                               CallbackInfoReturnable<ImmutableList<Pair<Integer, ? extends Task<? super VillagerEntity>>>> cir) {
         Task<? super VillagerEntity> villagerWorkTask = new VillagerWorkTask(); // Plays working sounds on the job site.
         Task<? super VillagerEntity> secondaryWorkTask = null;
         // GoToIfNearby makes the villager wander around the job site.
         Task<? super VillagerEntity> thirdWorkTask = GoAroundTask.create(MemoryModuleType.JOB_SITE, 0.4f, 4);
-        switch (profession.toString()) {
+        switch (professionEntry.toString()) {
             case "armorer":
                 if (CONFIG.villagersProfessionConfig.armorerHealsGolems) {
                     secondaryWorkTask = new HealGolemTask();
@@ -151,7 +153,7 @@ public abstract class VillagerTaskListProviderMixin {
         cir.cancel();
     }
 
-    @ModifyArg(method = "createMeetTasks(Lnet/minecraft/village/VillagerProfession;F)Lcom/google/common/collect/ImmutableList;",
+    @ModifyArg(method = "createMeetTasks",
             at = @At(value = "INVOKE",
             target = "Lnet/minecraft/entity/ai/brain/task/VillagerWalkTowardsTask;create(Lnet/minecraft/entity/ai/brain/MemoryModuleType;FIII)Lnet/minecraft/entity/ai/brain/task/SingleTickTask;"),
             index = 2)

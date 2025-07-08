@@ -25,7 +25,7 @@ public class GoToSecondaryPositionTaskMixin {
                                          int primaryPositionActivationDistance,
                                          ServerWorld serverWorld, VillagerEntity villagerEntity, long time,
                                          CallbackInfoReturnable<Boolean> cir) {
-        if (villagerEntity.getVillagerData().getProfession() == VillagerProfession.FISHERMAN &&
+        if (villagerEntity.getVillagerData().profession().value().id() == VillagerProfession.FISHERMAN &&
                 villagerEntity.getMainHandStack().isOf(Items.FISHING_ROD)) {
                 cir.setReturnValue(false);
                 cir.cancel();

@@ -23,12 +23,10 @@ public class FarmlandBlockMixin extends Block {
         super(settings);
     }
 
-    @Inject(method = "onLandedUpon(Lnet/minecraft/world/World;Lnet/minecraft/block/BlockState;" +
-            "Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/entity/Entity;F)V",
+    @Inject(method = "onLandedUpon",
     at = @At("HEAD"),
     cancellable = true)
-    public void villagerDontTrample(World world, BlockState state, BlockPos pos, Entity entity,
-                                    float fallDistance, CallbackInfo ci) {
+    public void villagerDontTrample(World world, BlockState state, BlockPos pos, Entity entity, double fallDistance, CallbackInfo ci) {
         if ((CONFIG.villagersGeneralConfig.villagersDontTrampleCrops && entity instanceof VillagerEntity) ||
             (CONFIG.golemsConfig.golemsDontTrampleCrops && entity instanceof GolemEntity)) {
             super.onLandedUpon(world, state, pos, entity, fallDistance);

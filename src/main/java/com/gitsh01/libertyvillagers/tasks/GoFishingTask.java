@@ -87,7 +87,7 @@ public class GoFishingTask extends MultiTickTask<VillagerEntity> {
 
                 // Next, look for an entity between us and the block that the bobber might hit to avoid fishing
                 // through buddies.
-                if (ProjectileUtil.getEntityCollision(serverWorld, villagerEntity, bobberStartPosition, centerBlockPos,
+                if (ProjectileUtil.getEntityCollision(serverWorld, bobber, bobberStartPosition, centerBlockPos,
                         box, Entity::isAlive) != null) {
                     // We're going to hit someone.
                     continue;
@@ -197,8 +197,8 @@ public class GoFishingTask extends MultiTickTask<VillagerEntity> {
         bobber.setVelocity(vec3d);
         bobber.setYaw((float) (MathHelper.atan2(vec3d.x, vec3d.z) * 57.2957763671875));
         bobber.setPitch((float) (MathHelper.atan2(vec3d.y, vec3d.horizontalLength()) * 57.2957763671875));
-        bobber.prevYaw = bobber.getYaw();
-        bobber.prevPitch = bobber.getPitch();
+        bobber.lastYaw = bobber.getYaw();
+        bobber.lastPitch = bobber.getPitch();
 
         serverWorld.spawnEntity(bobber);
         serverWorld.playSound(null, thrower.getX(), thrower.getY(), thrower.getZ(),

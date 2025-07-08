@@ -38,35 +38,35 @@ public abstract class GatherItemsVillagerTaskMixin {
         if (villagerEntity.squaredDistanceTo(villagerEntity2) > 5.0) {
             return;
         }
-        if (villagerEntity2.getVillagerData().getProfession() == VillagerProfession.FARMER) {
+        if (villagerEntity2.getVillagerData().profession().value().id() == VillagerProfession.FARMER) {
             GatherItemsVillagerTaskMixin.giveHalfOfStack(villagerEntity, ImmutableSet.of(Items.PUMPKIN),
                     villagerEntity2);
         }
         if ((CONFIG.villagersProfessionConfig.leatherworkersFeedCows &&
-                villagerEntity2.getVillagerData().getProfession() == VillagerProfession.LEATHERWORKER) ||
+                villagerEntity2.getVillagerData().profession().value().id() == VillagerProfession.LEATHERWORKER) ||
                 (CONFIG.villagersProfessionConfig.butchersFeedCows &&
-                        villagerEntity2.getVillagerData().getProfession() == VillagerProfession.BUTCHER) ||
+                        villagerEntity2.getVillagerData().profession().value().id() == VillagerProfession.BUTCHER) ||
                 (CONFIG.villagersProfessionConfig.butchersFeedSheep &&
-                        villagerEntity2.getVillagerData().getProfession() == VillagerProfession.BUTCHER) ||
+                        villagerEntity2.getVillagerData().profession().value().id() == VillagerProfession.BUTCHER) ||
                 (CONFIG.villagersProfessionConfig.shepherdsFeedSheep &&
-                        villagerEntity2.getVillagerData().getProfession() == VillagerProfession.SHEPHERD)) {
+                        villagerEntity2.getVillagerData().profession().value().id() == VillagerProfession.SHEPHERD)) {
             GatherItemsVillagerTaskMixin.giveHalfOfStack(villagerEntity, ImmutableSet.of(Items.WHEAT), villagerEntity2);
         }
         if (CONFIG.villagersProfessionConfig.butchersFeedPigs &&
-                villagerEntity2.getVillagerData().getProfession() == VillagerProfession.BUTCHER) {
+                villagerEntity2.getVillagerData().profession().value().id() == VillagerProfession.BUTCHER) {
             GatherItemsVillagerTaskMixin.giveHalfOfStack(villagerEntity, ImmutableSet.of(Items.CARROT, Items.POTATO),
                     villagerEntity2);
         }
         if ((CONFIG.villagersProfessionConfig.butchersFeedChickens &&
-                villagerEntity2.getVillagerData().getProfession() == VillagerProfession.BUTCHER) ||
+                villagerEntity2.getVillagerData().profession().value().id() == VillagerProfession.BUTCHER) ||
                 (CONFIG.villagersProfessionConfig.fletchersFeedChickens &&
-                        villagerEntity2.getVillagerData().getProfession() == VillagerProfession.FLETCHER)) {
+                        villagerEntity2.getVillagerData().profession().value().id() == VillagerProfession.FLETCHER)) {
             GatherItemsVillagerTaskMixin.giveHalfOfStack(villagerEntity,
                     ImmutableSet.of(Items.WHEAT_SEEDS, Items.BEETROOT_SEEDS, Items.MELON_SEEDS, Items.PUMPKIN_SEEDS),
                     villagerEntity2);
         }
         if (CONFIG.villagersProfessionConfig.butchersFeedRabbits &&
-                villagerEntity2.getVillagerData().getProfession() == VillagerProfession.BUTCHER) {
+                villagerEntity2.getVillagerData().profession().value().id() == VillagerProfession.BUTCHER) {
             GatherItemsVillagerTaskMixin.giveHalfOfStack(villagerEntity, ImmutableSet.of(Items.CARROT),
                     villagerEntity2);
         }

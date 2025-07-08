@@ -25,6 +25,7 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
@@ -64,23 +65,41 @@ public class VillagerInfo {
 
         float maxDistance = 50;
         float tickDelta = 0;
-        Vec3d vec3d = player.getCameraPosVec(tickDelta);
-        Vec3d vec3d2 = player.getRotationVec(tickDelta);
-        Vec3d vec3d3 = vec3d.add(vec3d2.x * maxDistance, vec3d2.y * maxDistance, vec3d2.z * maxDistance);
-        HitResult hit = serverWorld.raycast(
-                new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE,
-                        player));
 
-        // Found a block between us and the max distance, update the max distance for the entity check.
+        Vec3d start = player.getCameraPosVec(tickDelta);
+        Vec3d direction = player.getRotationVec(tickDelta);
+        Vec3d end = start.add(direction.multiply(maxDistance));
+
+        HitResult hit = serverWorld.raycast(new RaycastContext(
+                start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, player
+        ));
+
+        // If a block is hit, shorten ray to that
         if (hit.getType() != HitResult.Type.MISS) {
-            vec3d3 = hit.getPos();
+            end = hit.getPos();
         }
 
-        HitResult hitResult2;
-        // Look for an entity between us and the block.
-        if ((hitResult2 = ProjectileUtil.getEntityCollision(serverWorld, player, vec3d2, vec3d3,
-                player.getBoundingBox().stretch(player.getVelocity()).expand(maxDistance), Entity::isAlive)) != null) {
-            hit = hitResult2;
+        EntityHitResult closestEntityHit = null;
+        double closestDistanceSq = Double.MAX_VALUE;
+
+        for (Entity entity : serverWorld.getOtherEntities(player,
+                player.getBoundingBox().stretch(direction.multiply(maxDistance)).expand(1.0),
+                e -> e.isAlive() && !e.isSpectator() && e != player)) {
+
+            Box entityBox = entity.getBoundingBox().expand(0.3); // Allow some leeway
+            Optional<Vec3d> optionalHit = entityBox.raycast(start, end);
+
+            if (optionalHit.isPresent()) {
+                double distanceSq = start.squaredDistanceTo(optionalHit.get());
+                if (distanceSq < closestDistanceSq) {
+                    closestDistanceSq = distanceSq;
+                    closestEntityHit = new EntityHitResult(entity, optionalHit.get());
+                }
+            }
+        }
+
+        if (closestEntityHit != null) {
+            hit = closestEntityHit;
         }
 
         List<Text> lines = null;
@@ -96,8 +115,7 @@ public class VillagerInfo {
                 }
                 break;
             case ENTITY:
-                EntityHitResult entityHit = (EntityHitResult) hit;
-                Entity entity = entityHit.getEntity();
+                Entity entity = ((EntityHitResult) hit).getEntity();
                 if (entity != null) {
                     lines = getEntityInfo(serverWorld, entity);
                 }
@@ -127,7 +145,7 @@ public class VillagerInfo {
 
         VillagerEntity villager = (VillagerEntity)entity;
         String occupation =
-                VillagerStats.translatedProfession(villager.getVillagerData().getProfession());
+                VillagerStats.translatedProfession(villager.getVillagerData().profession().value());
         lines.add(Text.translatable("text.LibertyVillagers.villagerInfo.occupation", occupation));
 
         // Client-side villagers don't have memories.

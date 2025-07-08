@@ -19,7 +19,7 @@ public class HoldTradeOffersTaskMixin {
             cancellable = true)
     public void shouldRunIfNotFishing(ServerWorld serverWorld, VillagerEntity villagerEntity,
                              CallbackInfoReturnable<Boolean> cir) {
-        if (villagerEntity.getVillagerData().getProfession() == VillagerProfession.FISHERMAN &&
+        if (villagerEntity.getVillagerData().profession().value().id() == VillagerProfession.FISHERMAN &&
                 villagerEntity.getEquippedStack(EquipmentSlot.MAINHAND).isOf(Items.FISHING_ROD)) {
             cir.setReturnValue(false);
             cir.cancel();

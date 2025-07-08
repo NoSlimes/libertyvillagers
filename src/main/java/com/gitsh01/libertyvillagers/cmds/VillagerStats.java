@@ -18,7 +18,9 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -146,10 +148,10 @@ public class VillagerStats {
         int unemployed = 0;
         int homeless = 0;
         for (VillagerEntity villager : villagers) {
-            if (villager.getVillagerData().getProfession() == VillagerProfession.NITWIT) {
+            if (villager.getVillagerData().profession().value().id() == VillagerProfession.NITWIT) {
                 nitwits++;
             }
-            if (villager.getVillagerData().getProfession() == VillagerProfession.NONE) {
+            if (villager.getVillagerData().profession().value().id() == VillagerProfession.NONE) {
                 unemployed++;
             }
             if (villager.isBaby()) {
@@ -219,11 +221,11 @@ public class VillagerStats {
         for (VillagerEntity villager : villagers) {
             if (villager.isBaby()) {
                 String babyText = Text.translatable("text.LibertyVillagers.villagerStats.baby").getString();
-                villagerProfessionMap.merge(babyText, new ProfessionInfo(villager.getVillagerData().getProfession(), 1),
+                villagerProfessionMap.merge(babyText, new ProfessionInfo(villager.getVillagerData().profession().value(), 1),
                         ProfessionInfo::mergeProfessionInfo);
             } else {
-                villagerProfessionMap.merge(translatedProfession(villager.getVillagerData().getProfession()),
-                        new ProfessionInfo(villager.getVillagerData().getProfession(), 1),
+                villagerProfessionMap.merge(translatedProfession(villager.getVillagerData().profession().value()),
+                        new ProfessionInfo(villager.getVillagerData().profession().value(), 1),
                         ProfessionInfo::mergeProfessionInfo);
             }
         }
@@ -369,15 +371,17 @@ public class VillagerStats {
                 .getString() + "\n\n";
 
         TreeMap<String, Integer> catVariantMap = new TreeMap<>();
+        Registry<CatVariant> catVariantRegistry = serverWorld.getRegistryManager().getOrThrow(RegistryKeys.CAT_VARIANT);
 
-        for (Map.Entry<RegistryKey<CatVariant>, CatVariant> catVariantEntry : Registries.CAT_VARIANT.getEntrySet()) {
+        for (Map.Entry<RegistryKey<CatVariant>, CatVariant> catVariantEntry : catVariantRegistry.getEntrySet()) {
             catVariantMap.put(translatedCatVariant(catVariantEntry.getKey().getValue().toShortTranslationKey()), 0);
         }
 
         if (cats.size() > 0) {
             for (CatEntity cat : cats) {
-                String variant =
-                        translatedCatVariant(Registries.CAT_VARIANT.getId(cat.getVariant().value()).toShortTranslationKey());
+                String variant = translatedCatVariant(
+                        catVariantRegistry.getId(cat.getVariant().value()).toShortTranslationKey()
+                );
                 catVariantMap.merge(variant, 1, Integer::sum);
             }
 
@@ -385,10 +389,9 @@ public class VillagerStats {
 
             AtomicReference<String> catVariants = new AtomicReference<>("");
             catVariantMap.forEach((catVariant, sum) -> catVariants.set(catVariants.get() +
-                    Text.translatable("text.LibertyVillagers.villagerStats.professionsCountFormat",
-                            catVariant, sum).getString() + "\n"));
+                    Text.translatable("text.LibertyVillagers.villagerStats.professionsCountFormat", catVariant, sum).getString() + "\n"));
 
-            pageString += catVariants;
+            pageString += catVariants.get();
         }
 
         return pageString;

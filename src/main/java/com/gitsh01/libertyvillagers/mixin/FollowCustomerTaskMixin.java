@@ -16,7 +16,7 @@ public class FollowCustomerTaskMixin {
     @Inject(method = "shouldRun", at = @At(value = "HEAD"), cancellable = true)
     protected void replaceShouldRun(ServerWorld serverWorld, VillagerEntity villager,
                                     CallbackInfoReturnable<Boolean> cir) {
-        if (villager.getVillagerData().getProfession() == VillagerProfession.FISHERMAN &&
+        if (villager.getVillagerData().profession().value().id() == VillagerProfession.FISHERMAN &&
                 villager.getMainHandStack().isOf(Items.FISHING_ROD)) {
             cir.setReturnValue(false);
             cir.cancel();

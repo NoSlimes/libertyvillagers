@@ -7,7 +7,12 @@ import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.entity.passive.CatVariant;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
@@ -41,20 +46,10 @@ public abstract class CatEntityMixin extends TameableEntity {
         }
 
         if (CONFIG.catsConfig.allBlackCats) {
-            Registries.CAT_VARIANT
-                    .getEntry(CatVariant.ALL_BLACK.getValue())
-                    .ifPresent(this::setVariant);
+            Registry<CatVariant> catVariantRegistry = ((ServerWorld) world).getRegistryManager().getOrThrow(RegistryKeys.CAT_VARIANT);
+            Identifier blackCatId = Identifier.of("minecraft", "all_black");
+            catVariantRegistry.getEntry(blackCatId).ifPresent(this::setVariant);
         }
     }
 
-    @Redirect(method = "initialize",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/ServerWorldAccess;getMoonSize()F"))
-    private float replaceMoonSize(ServerWorldAccess world) {
-        if (CONFIG.catsConfig.blackCatsAtAnyTime) {
-            return 1.0f;
-        }
-
-        return world.getMoonSize();
-    }
 }

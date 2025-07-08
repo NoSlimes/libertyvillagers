@@ -12,11 +12,14 @@ import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.storage.ReadView;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.village.VillagerData;
 import net.minecraft.village.VillagerDataContainer;
@@ -25,6 +28,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.poi.PointOfInterestStorage;
 import net.minecraft.world.poi.PointOfInterestType;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -55,6 +60,7 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
     @Shadow
     public static Map<Item, Integer> ITEM_FOOD_VALUES;
 
+    @Shadow @Final private static Logger LOGGER;
     @Unique
     private static Set<Item> GATHERABLE_ITEMS = Sets.newHashSet();
 
@@ -120,13 +126,20 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
         }
         ServerWorld world = (ServerWorld) this.getWorld();
 
-        VillagerProfession profession = this.getVillagerData().getProfession();
-        if (CONFIG.villagersGeneralConfig.noNitwitVillagers && profession == VillagerProfession.NITWIT) {
-            this.setVillagerData(getVillagerData().withProfession(VillagerProfession.NONE));
+        VillagerProfession profession = this.getVillagerData().profession().value();
+        if (CONFIG.villagersGeneralConfig.noNitwitVillagers && profession.id() == VillagerProfession.NITWIT) {
+            Registry<VillagerProfession> professionRegistry = ((ServerWorld) world).getRegistryManager().getOrThrow(RegistryKeys.VILLAGER_PROFESSION);
+            RegistryEntry<VillagerProfession> noneProfessionEntry = professionRegistry.getEntry(VillagerProfession.NONE.getValue()).orElseThrow();
+
+            this.setVillagerData(getVillagerData().withProfession(noneProfessionEntry));
+
             brain.stopAllTasks(world, (VillagerEntity) ((Object) this));
         }
-        if (CONFIG.villagersGeneralConfig.allNitwitVillagers && profession != VillagerProfession.NITWIT) {
-            this.setVillagerData(getVillagerData().withProfession(VillagerProfession.NITWIT));
+        if (CONFIG.villagersGeneralConfig.allNitwitVillagers && profession.id() != VillagerProfession.NITWIT) {
+            Registry<VillagerProfession> professionRegistry = ((ServerWorld) world).getRegistryManager().getOrThrow(RegistryKeys.VILLAGER_PROFESSION);
+            RegistryEntry<VillagerProfession> nitwitProfessionEntry = professionRegistry.getEntry(VillagerProfession.NITWIT.getValue()).orElseThrow();
+
+            this.setVillagerData(getVillagerData().withProfession(nitwitProfessionEntry));
             this.releaseTicketFor(brain, world, MemoryModuleType.JOB_SITE);
             this.releaseTicketFor(brain, world, MemoryModuleType.POTENTIAL_JOB_SITE);
             brain.stopAllTasks(world, (VillagerEntity) ((Object) this));
@@ -210,19 +223,20 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
         }
     }
 
-    @Inject(method = "readCustomDataFromNbt",
+    @Inject(method = "readCustomData",
             at = @At("TAIL"))
-   public void readCustomDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
+    public void onReadCustomData(ReadView view, CallbackInfo ci) {
         // If initialized with a rod, get rid of it.
         if (this.getMainHandStack().isOf(Items.FISHING_ROD)) {
             this.equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
         }
+
         // Get rid of items the villager can't gather.
-        for (int i = this.getInventory().size(); i >= 0; i-- ) {
+        for (int i = this.getInventory().size() - 1; i >= 0; i--) {
             ItemStack stack = this.getInventory().getStack(i);
             if (stack.isEmpty()) continue;
             if (GATHERABLE_ITEMS.contains(stack.getItem())) continue;
-            if (this.getVillagerData().getProfession().gatherableItems().contains(stack.getItem())) continue;
+            if (this.getVillagerData().profession().value().gatherableItems().contains(stack.getItem())) continue;
             this.getInventory().removeStack(i);
         }
     }

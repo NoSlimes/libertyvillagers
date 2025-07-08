@@ -60,7 +60,7 @@ public abstract class FarmerVillagerTaskMixin {
         if (!serverWorld.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
             cir.setReturnValue(false);
             cir.cancel();
-        } else if (villagerEntity.getVillagerData().getProfession() != VillagerProfession.FARMER) {
+        } else if (villagerEntity.getVillagerData().profession().value().id() != VillagerProfession.FARMER) {
             cir.setReturnValue(false);
             cir.cancel();
         } else {

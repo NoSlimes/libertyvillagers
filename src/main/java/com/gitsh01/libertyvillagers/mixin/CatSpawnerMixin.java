@@ -11,7 +11,7 @@ import static com.gitsh01.libertyvillagers.LibertyVillagersMod.CONFIG;
 public class CatSpawnerMixin {
 
     @ModifyConstant(
-            method = "spawnInHouse(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)I",
+            method = "spawnInHouse",
             constant = @Constant(doubleValue = 48.0))
     private double replaceCatSpawnDistanceXZ(double value) {
         if (CONFIG.catsConfig.catsSpawnLimit) {
@@ -21,7 +21,7 @@ public class CatSpawnerMixin {
     }
 
     @ModifyConstant(
-            method = "spawnInHouse(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)I",
+            method = "spawnInHouse",
             constant = @Constant(doubleValue = 8.0))
     private double replaceCatSpawnDistanceY(double value) {
         if (CONFIG.catsConfig.catsSpawnLimit) {
@@ -31,7 +31,7 @@ public class CatSpawnerMixin {
     }
 
     @ModifyConstant(
-            method = "spawnInHouse(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/util/math/BlockPos;)I",
+            method = "spawnInHouse",
             constant = @Constant(intValue = 5))
     private int replaceCatSpawnLimitCount(int value) {
         if (CONFIG.catsConfig.catsSpawnLimit) {

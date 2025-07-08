@@ -3,6 +3,8 @@ package com.gitsh01.libertyvillagers.mixin;
 import net.minecraft.entity.EntityStatuses;
 import net.minecraft.entity.ai.brain.task.VillagerBreedTask;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
@@ -30,10 +32,17 @@ public abstract class VillagerBreedTaskMixin {
             at = @At("HEAD"), cancellable = true)
     private void goHome(ServerWorld world, VillagerEntity first, VillagerEntity second, CallbackInfo ci) {
         if (CONFIG.villagersGeneralConfig.villagerBabiesRequireWorkstationAndBed) {
+            Registry<VillagerProfession> professionRegistry = ((ServerWorld) world).getRegistryManager().getOrThrow(RegistryKeys.VILLAGER_PROFESSION);
+
+            RegistryEntry<VillagerProfession> noneProfessionEntry = professionRegistry.getOrThrow(VillagerProfession.NONE);
+            VillagerProfession noneProfession = noneProfessionEntry.value();
+
             Optional<BlockPos> optionalWorkstation = world.getPointOfInterestStorage()
-                    .getPosition(VillagerProfession.NONE.acquirableWorkstation(),
-                            (poiType, pos) -> this.canReachHome(first, pos, poiType), first.getBlockPos(),
+                    .getPosition(noneProfession.acquirableWorkstation(),
+                            (poiType, pos) -> this.canReachHome(first, pos, poiType),
+                            first.getBlockPos(),
                             CONFIG.villagerPathfindingConfig.findPOIRange);
+            
             if (optionalWorkstation.isEmpty()) {
                 world.sendEntityStatus(second, EntityStatuses.ADD_VILLAGER_ANGRY_PARTICLES);
                 world.sendEntityStatus(first, EntityStatuses.ADD_VILLAGER_ANGRY_PARTICLES);

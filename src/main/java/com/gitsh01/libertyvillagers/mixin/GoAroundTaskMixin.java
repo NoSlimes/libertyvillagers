@@ -28,7 +28,7 @@ public class GoAroundTaskMixin {
                                          CallbackInfoReturnable<Boolean> cir) {
         if (pathAwareEntity.getType() == EntityType.VILLAGER) {
             VillagerEntity villager = (VillagerEntity) pathAwareEntity;
-            if (villager.getVillagerData().getProfession() == VillagerProfession.FISHERMAN &&
+            if (villager.getVillagerData().profession().value().id() == VillagerProfession.FISHERMAN &&
                     villager.getMainHandStack().isOf(Items.FISHING_ROD)) {
                 cir.setReturnValue(false);
                 cir.cancel();

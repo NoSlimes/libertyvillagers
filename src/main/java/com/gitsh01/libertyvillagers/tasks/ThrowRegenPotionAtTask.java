@@ -7,7 +7,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.thrown.PotionEntity;
+import net.minecraft.entity.projectile.thrown.SplashPotionEntity;
 import net.minecraft.item.Items;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
@@ -56,7 +58,7 @@ public class ThrowRegenPotionAtTask extends HealTargetTask {
         double f = currentPatient.getZ() + vec3d.z - villagerEntity.getZ();
         double g = Math.sqrt(d * d + f * f);
 
-        PotionEntity potionEntity = new PotionEntity(EntityType.POTION, serverWorld);
+        PotionEntity potionEntity = new SplashPotionEntity(EntityType.SPLASH_POTION, serverWorld);
         potionEntity.setPos(villagerEntity.getX(), villagerEntity.getY(), villagerEntity.getZ());
 
         potionEntity.setItem(PotionContentsComponent.createStack(Items.SPLASH_POTION, Potions.REGENERATION));

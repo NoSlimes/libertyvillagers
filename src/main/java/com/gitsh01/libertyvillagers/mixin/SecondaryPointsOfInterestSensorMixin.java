@@ -25,10 +25,10 @@ public class SecondaryPointsOfInterestSensorMixin {
             method = "sense(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/passive/VillagerEntity;)V",
             constant = @Constant(intValue = 4))
     private int replacePosXZ(int xz) {
-        if (villagerEntity.getVillagerData().getProfession() == VillagerProfession.FARMER) {
+        if (villagerEntity.getVillagerData().profession().value().id() == VillagerProfession.FARMER) {
             return CONFIG.villagersProfessionConfig.findCropRangeHorizontal;
         }
-        if (villagerEntity.getVillagerData().getProfession() == VillagerProfession.FISHERMAN) {
+        if (villagerEntity.getVillagerData().profession().value().id() == VillagerProfession.FISHERMAN) {
             return CONFIG.villagersProfessionConfig.fishermanFindWaterRange;
         }
         return xz;
@@ -38,10 +38,10 @@ public class SecondaryPointsOfInterestSensorMixin {
             method = "sense(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/passive/VillagerEntity;)V",
             constant = @Constant(intValue = -4))
     private int replaceNegXZ(int xz) {
-        if (villagerEntity.getVillagerData().getProfession() == VillagerProfession.FARMER) {
+        if (villagerEntity.getVillagerData().profession().value().id() == VillagerProfession.FARMER) {
             return -1 * CONFIG.villagersProfessionConfig.findCropRangeHorizontal;
         }
-        if (villagerEntity.getVillagerData().getProfession() == VillagerProfession.FISHERMAN) {
+        if (villagerEntity.getVillagerData().profession().value().id() == VillagerProfession.FISHERMAN) {
             return -1 * CONFIG.villagersProfessionConfig.fishermanFindWaterRange;
         }
         return xz;
@@ -51,7 +51,7 @@ public class SecondaryPointsOfInterestSensorMixin {
             method = "sense(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/passive/VillagerEntity;)V",
             constant = @Constant(intValue = 2))
     private int replacePosY(int y) {
-        if (villagerEntity.getVillagerData().getProfession() == VillagerProfession.FARMER) {
+        if (villagerEntity.getVillagerData().profession().value().id() == VillagerProfession.FARMER) {
             return CONFIG.villagersProfessionConfig.findCropRangeVertical;
         }
         return y;
@@ -61,7 +61,7 @@ public class SecondaryPointsOfInterestSensorMixin {
             method = "sense(Lnet/minecraft/server/world/ServerWorld;Lnet/minecraft/entity/passive/VillagerEntity;)V",
             constant = @Constant(intValue = -2))
     private int replaceNegY(int y) {
-        if (villagerEntity.getVillagerData().getProfession() == VillagerProfession.FARMER) {
+        if (villagerEntity.getVillagerData().profession().value().id() == VillagerProfession.FARMER) {
             return -1 * CONFIG.villagersProfessionConfig.findCropRangeVertical;
         }
         return y;
