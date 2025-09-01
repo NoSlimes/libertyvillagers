@@ -19,7 +19,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
 import net.minecraft.util.math.GlobalPos;
 import net.minecraft.village.VillagerData;
 import net.minecraft.village.VillagerDataContainer;
@@ -223,20 +222,23 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
         }
     }
 
-    @Inject(method = "readCustomData",
-            at = @At("TAIL"))
-    public void onReadCustomData(ReadView view, CallbackInfo ci) {
+    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
+    public void onReadCustomData(NbtCompound nbt, CallbackInfo ci) {
         // If initialized with a rod, get rid of it.
         if (this.getMainHandStack().isOf(Items.FISHING_ROD)) {
             this.equipStack(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
         }
 
-        // Get rid of items the villager can't gather.
         for (int i = this.getInventory().size() - 1; i >= 0; i--) {
             ItemStack stack = this.getInventory().getStack(i);
             if (stack.isEmpty()) continue;
             if (GATHERABLE_ITEMS.contains(stack.getItem())) continue;
-            if (this.getVillagerData().profession().value().gatherableItems().contains(stack.getItem())) continue;
+
+            RegistryEntry<VillagerProfession> profEntry = this.getVillagerData().profession();
+
+            VillagerProfession profession = profEntry.value();
+            if (profession.gatherableItems().contains(stack.getItem())) continue;
+
             this.getInventory().removeStack(i);
         }
     }
