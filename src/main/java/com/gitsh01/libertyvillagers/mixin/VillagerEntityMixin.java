@@ -17,7 +17,6 @@ import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.util.math.GlobalPos;
@@ -121,10 +120,10 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
 
     @Inject(at = @At("HEAD"), method = "initBrain(Lnet/minecraft/entity/ai/brain/Brain;)V")
     private void changeVillagerProfession(Brain<VillagerEntity> brain, CallbackInfo ci) {
-        if (!(this.getWorld() instanceof ServerWorld)) {
+        if (!(this.getEntityWorld() instanceof ServerWorld)) {
             return;
         }
-        ServerWorld world = (ServerWorld) this.getWorld();
+        ServerWorld world = (ServerWorld) this.getEntityWorld();
 
         VillagerProfession profession = this.getVillagerData().profession().value();
         if (CONFIG.villagersGeneralConfig.noNitwitVillagers && profession.id() == VillagerProfession.NITWIT) {
@@ -159,7 +158,7 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
             BiPredicate<VillagerEntity, RegistryEntry<PointOfInterestType>> biPredicate = POINTS_OF_INTEREST.get(memoryModuleType);
             if (optional.isPresent() && biPredicate.test((VillagerEntity) ((Object) this), optional.get())) {
                 pointOfInterestStorage.releaseTicket(pos.pos());
-                DebugInfoSender.sendPointOfInterest(serverWorld, pos.pos());
+//                DebugInfoSender.sendPointOfInterest(serverWorld, pos.pos());
             }
         });
     }
@@ -214,7 +213,7 @@ public abstract class VillagerEntityMixin extends MerchantEntity implements Inte
             cir.cancel();
         }
         if (CONFIG.golemsConfig.golemSpawnLimit) {
-            List<IronGolemEntity> golems = this.getWorld().getNonSpectatingEntities(IronGolemEntity.class,
+            List<IronGolemEntity> golems = this.getEntityWorld().getNonSpectatingEntities(IronGolemEntity.class,
                     this.getBoundingBox().expand(CONFIG.golemsConfig.golemSpawnLimitRange));
             if (golems.size() >= CONFIG.golemsConfig.golemSpawnLimitCount) {
                 cir.setReturnValue(false);

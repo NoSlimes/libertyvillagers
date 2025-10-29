@@ -37,7 +37,7 @@ public abstract class WanderAroundFarGoalMixin extends WanderAroundGoal  {
         if (dest == null) {
             return;
         }
-        ServerWorld serverWorld = (ServerWorld) this.mob.getWorld();
+        ServerWorld serverWorld = (ServerWorld) this.mob.getEntityWorld();
         PointOfInterestStorage pointOfInterestStorage = serverWorld.getPointOfInterestStorage();
 
         Optional<BlockPos> nearestBell =

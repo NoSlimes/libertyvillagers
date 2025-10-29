@@ -30,7 +30,7 @@ public class ReturnToShoreGoal extends WanderAroundGoal {
         protected Vec3d getWanderTarget() {
             if (CONFIG.golemsConfig.golemMoveToShore) {
                 if (this.mob.isTouchingWater()) {
-                    ServerWorld serverWorld = (ServerWorld) this.mob.getWorld();
+                    ServerWorld serverWorld = (ServerWorld) this.mob.getEntityWorld();
                     BlockPos blockPos = this.mob.getBlockPos();
                     for (BlockPos blockPos2 : BlockPos.iterateOutwards(blockPos, CONFIG.golemsConfig.golemPathfindToShoreRange,
                             CONFIG.golemsConfig.golemPathfindToShoreRange, CONFIG.golemsConfig.golemPathfindToShoreRange)) {

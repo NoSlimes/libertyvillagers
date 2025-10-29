@@ -24,14 +24,9 @@ import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.GlobalPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
-import net.minecraft.world.poi.PointOfInterestStorage;
-import net.minecraft.world.poi.PointOfInterestType;
-import net.minecraft.world.poi.PointOfInterestTypes;
+import net.minecraft.world.poi.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -226,7 +221,7 @@ public class VillagerInfo {
                 lines.add(Text.translatable("text.LibertyVillagers.villagerInfo.numBees", numBees));
             }
 
-            int numHoney = blockState.getComparatorOutput(serverWorld, blockPos);
+            int numHoney = blockState.getComparatorOutput(serverWorld, blockPos, Direction.NORTH);
             lines.add(Text.translatable("text.LibertyVillagers.villagerInfo.numHoney", numHoney));
         }
 
@@ -256,8 +251,19 @@ public class VillagerInfo {
             return lines;
         }
 
-        @SuppressWarnings("deprecation")
-        int freeTickets = storage.getFreeTickets(blockPos);
+        // count villagers that have this BlockPos as their JOB_SITE memory
+        Box searchBox = new Box(
+                blockPos.getX() - 64.0, blockPos.getY() - 64.0, blockPos.getZ() - 64.0,
+                blockPos.getX() + 64.0, blockPos.getY() + 64.0, blockPos.getZ() + 64.0
+        );
+        int occupants = serverWorld.getEntitiesByClass(VillagerEntity.class, searchBox,
+                        v -> v.getBrain().getOptionalMemory(MemoryModuleType.JOB_SITE)
+                                .map(gp -> gp.pos().equals(blockPos)).orElse(false))
+                .size();
+
+// compute free tickets (clamped >= 0)
+        int freeTickets = Math.max(0, poiType.ticketCount() - occupants);
+
         Text isOccupied =
                 freeTickets < poiType.ticketCount() ? Text.translatable("text.LibertyVillagers.villagerInfo.true") :
                         Text.translatable("text" + ".LibertyVillagers.villagerInfo.false");

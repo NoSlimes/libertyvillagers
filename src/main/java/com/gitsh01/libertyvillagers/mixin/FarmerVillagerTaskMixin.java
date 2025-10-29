@@ -117,7 +117,7 @@ public abstract class FarmerVillagerTaskMixin {
         BlockState blockState = serverWorld.getBlockState(currentTarget);
         Block block = blockState.getBlock();
         Block block2 = serverWorld.getBlockState(currentTarget.down()).getBlock();
-        if (currentTarget.isWithinDistance(villagerEntity.getPos(), distance)) {
+        if (currentTarget.isWithinDistance(villagerEntity.getEntityPos(), distance)) {
             boolean foundBlockCrop = false;
             if (CONFIG.villagersProfessionConfig.preferPlantSameCrop) {
                 if (block instanceof CropBlock && ((CropBlock) block).isMature(blockState)) {

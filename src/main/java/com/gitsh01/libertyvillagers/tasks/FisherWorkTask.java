@@ -32,7 +32,7 @@ public class FisherWorkTask extends VillagerWorkTask {
         SimpleInventory simpleInventory = entity.getInventory();
         int cod = simpleInventory.count(Items.COD);
         int salmon = simpleInventory.count(Items.SALMON);
-        ServerWorld serverWorld = (ServerWorld)entity.getWorld();
+        ServerWorld serverWorld = (ServerWorld)entity.getEntityWorld();
         simpleInventory.removeItem(Items.COD, cod);
         simpleInventory.removeItem(Items.SALMON, salmon);
         ItemStack cookedSalmon = simpleInventory.addStack(new ItemStack(Items.COOKED_SALMON, salmon));

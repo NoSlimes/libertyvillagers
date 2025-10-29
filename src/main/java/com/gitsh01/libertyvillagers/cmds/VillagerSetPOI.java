@@ -7,7 +7,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.DebugInfoSender;
+//import net.minecraft.server.network.DebugInfoSender;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -80,11 +80,11 @@ public class VillagerSetPOI {
 
         if (!storage.hasTypeAt(optionalRegistryKey.get(), blockPos)) {
             storage.add(blockPos, optionalRegistryEntry.get());
-            DebugInfoSender.sendPoiAddition(serverWorld, blockPos);
+//            DebugInfoSender.sendPoiAddition(serverWorld, blockPos);
             player.sendMessage(Text.translatable("text.LibertyVillagers.villagerSetPOI.enable", name, poiTypeName));
         } else {
             storage.remove(blockPos);
-            DebugInfoSender.sendPoiRemoval(serverWorld, blockPos);
+//            DebugInfoSender.sendPoiRemoval(serverWorld, blockPos);
             player.sendMessage(Text.translatable("text.LibertyVillagers.villagerSetPOI.disable", name, poiTypeName));
         }
     }

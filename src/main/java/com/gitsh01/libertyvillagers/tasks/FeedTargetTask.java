@@ -38,7 +38,7 @@ public class FeedTargetTask extends HealTargetTask {
         }
 
         List<? extends LivingEntity> possiblePatients =
-                villagerEntity.getWorld().getNonSpectatingEntities(entityClass,
+                villagerEntity.getEntityWorld().getNonSpectatingEntities(entityClass,
                 villagerEntity.getBoundingBox().expand(range));
 
         if (possiblePatients.size() >= maxEntities) {

@@ -32,8 +32,8 @@ public abstract class WanderNearTargetGoalMixin {
             return;
         }
         if (CONFIG.golemsConfig.golemStayNearBell) {
-            Vec3d targetPos = this.mob.getTarget().getPos();
-            ServerWorld serverWorld = (ServerWorld) this.mob.getWorld();
+            Vec3d targetPos = this.mob.getTarget().getEntityPos();
+            ServerWorld serverWorld = (ServerWorld) this.mob.getEntityWorld();
             PointOfInterestStorage pointOfInterestStorage = serverWorld.getPointOfInterestStorage();
 
             Optional<BlockPos> nearestBell = pointOfInterestStorage.getNearestPosition(

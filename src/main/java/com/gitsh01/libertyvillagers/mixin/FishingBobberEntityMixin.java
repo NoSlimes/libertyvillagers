@@ -68,7 +68,7 @@ public abstract class FishingBobberEntityMixin extends ProjectileEntity {
             return;
         }
 
-        if (!this.getWorld().isClient && this.removeIfInvalidOwner()) {
+        if (!this.getEntityWorld().isClient() && this.removeIfInvalidOwner()) {
             ci.cancel();
             return;
         }
@@ -85,9 +85,9 @@ public abstract class FishingBobberEntityMixin extends ProjectileEntity {
         }
         float f = 0.0f;
         BlockPos blockPos = this.getBlockPos();
-        FluidState fluidState = this.getWorld().getFluidState(blockPos);
+        FluidState fluidState = this.getEntityWorld().getFluidState(blockPos);
         if (fluidState.isIn(FluidTags.WATER)) {
-            f = fluidState.getHeight(this.getWorld(), blockPos);
+            f = fluidState.getHeight(this.getEntityWorld(), blockPos);
         }
         boolean bl = f > 0.0f;
         if (isFlying) {
@@ -115,7 +115,7 @@ public abstract class FishingBobberEntityMixin extends ProjectileEntity {
                         this.setVelocity(this.getVelocity().add(0.0, -0.1 * (double) this.velocityRandom.nextFloat() *
                                 (double) this.velocityRandom.nextFloat(), 0.0));
                     }
-                    if (!this.getWorld().isClient) {
+                    if (!this.getEntityWorld().isClient()) {
                         this.tickFishingLogic(blockPos);
                     }
                 } else {
@@ -159,20 +159,20 @@ public abstract class FishingBobberEntityMixin extends ProjectileEntity {
 
     @Inject(method = "use", at = @At("HEAD"), cancellable = true)
     public void use(ItemStack usedItem, CallbackInfoReturnable<Integer> cir) {
-        if (this.getWorld().isClient || this.getOwner() == null || this.getOwner().getType() != EntityType.VILLAGER) {
+        if (this.getEntityWorld().isClient() || this.getOwner() == null || this.getOwner().getType() != EntityType.VILLAGER) {
             return;
         }
         VillagerEntity villager = (VillagerEntity) this.getOwner();
         int i = 0;
         if (this.hookCountdown > 0) {
-            Item fish = this.getWorld().getRandom().nextInt(2) == 0 ? Items.COD : Items.SALMON;
+            Item fish = this.getEntityWorld().getRandom().nextInt(2) == 0 ? Items.COD : Items.SALMON;
             ItemStack itemStack = new ItemStack(fish);
-            ItemEntity itemEntity = new ItemEntity(this.getWorld(), this.getX(), this.getY(), this.getZ(), itemStack);
+            ItemEntity itemEntity = new ItemEntity(this.getEntityWorld(), this.getX(), this.getY(), this.getZ(), itemStack);
             double d = villager.getX() - this.getX();
             double e = villager.getY() - this.getY();
             double f = villager.getZ() - this.getZ();
             itemEntity.setVelocity(d * 0.1, e * 0.1 + Math.sqrt(Math.sqrt(d * d + e * e + f * f)) * 0.08, f * 0.1);
-            this.getWorld().spawnEntity(itemEntity);
+            this.getEntityWorld().spawnEntity(itemEntity);
             i = 1;
         }
         if (this.isOnGround()) {
